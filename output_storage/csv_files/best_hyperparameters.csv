@@ -1,4 +1,4 @@
 parameter,value
-C,0.03153374350781029
+C,0.0305147146586369
 penalty,l1
-max_iter,1839
+max_iter,1655
