@@ -1,0 +1,4 @@
+parameter,value
+C,0.03153374350781029
+penalty,l1
+max_iter,1839

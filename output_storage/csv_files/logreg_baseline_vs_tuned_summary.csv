@@ -1,0 +1,4 @@
+model,mean_auc_roc,std_auc_roc,mean_accuracy,std_accuracy,mean_f1,std_f1,mean_precision,std_precision,mean_recall,std_recall
+LogReg_Baseline,0.770422,0.028817,0.73125,0.012655,0.82684,0.009066,0.949268,0.008534,0.732527,0.013658
+LogReg_Tuned,0.795098,0.038181,0.72,0.010181,0.818337,0.00634,0.948872,0.011378,0.71943,0.006262
+Delta (Tuned - Baseline),0.024676,,-0.01125,,-0.008503,,-0.000396,,-0.013097,

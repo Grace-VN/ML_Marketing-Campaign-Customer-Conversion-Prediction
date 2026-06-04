@@ -1,0 +1,2 @@
+original_shape,transformed_shape,n_numerical,n_categorical_raw,n_encoded,n_passthrough,n_total_features
+"(6400, 24)","(6400, 29)",21,3,8,0,29
