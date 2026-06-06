@@ -122,12 +122,12 @@ All models evaluated across 5 cross-validation folds:
 ![Baseline Models - All Metrics](output_storage/images/cv_baseline_grouped_bar.png)
 
 **Key Findings:**
-- **AdaBoost** achieved the highest recall (99.88%) with strong performance across all metrics
+- **AdaBoost** achieved the highest recall (99.9%) with strong performance across all metrics
   - Mean AUC-ROC: 0.8294 | Mean Accuracy: 89.67% | Mean F1: 94.43%
   - Std Dev: ~0.004 across metrics, indicating stable cross-fold performance
-- **SVM** ranked second in recall but with lower precision
+- **Random Forest** ranked second in recall but with lower precision, demonstrating its inherent power in binary classification tasks.
 - **MLP** showed moderate performance with higher variance
-- **Random Forest & Stacking** had acceptable but lower recall
+- **SVM & Stacking** had acceptable but lower recall
 
 **Decision:** AdaBoost selected for hyperparameter tuning due to superior recall + balanced performance across all metrics
 
