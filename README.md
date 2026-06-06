@@ -347,31 +347,30 @@ ML_Marketing Campaign-Customer Conversion/
 │   ├── SHAP.py
 │   └── __pycache__/
 ├── output_storage/                    # Results & visualizations
-│   ├── csv_files/                     # Exported metrics & data
-│   │   ├── summary_metrics.csv
-│   │   ├── classification_report.csv
-│   │   ├── shap_feature_importance.csv
-│   │   ├── test_predictions.csv
-│   │   ├── business_insight_summary.csv
-│   │   ├── gridsearch_cv_results.csv
-│   │   ├── adaboost_baseline_vs_tuned_summary.csv
-│   │   └── [other_metrics.csv]
-│   └── images/                        # Visualizations
-│       ├── cv_baseline_grouped_bar.png
-│       ├── cv_baseline_fold_lines_all_metrics.png
-│       ├── adaboost_baseline_vs_tuned_bar.png
-│       ├── adaboost_tuning_delta.png
-│       ├── confusion_matrix.png
-│       ├── roc_curve.png
-│       ├── precision_recall_threshold.png
-│       ├── calibration_curve.png
-│       ├── profit_curve.png
-│       ├── shap_bar_plot.png
-│       ├── shap_summary_plot.png
-│       ├── shap_dependence_*.png
-│       ├── shap_waterfall_*.png
-│       └── [other_visualizations.png]
-└── catboost_info/                     # CatBoost training logs (optional)
+    ├── csv_files/                     # Exported metrics & data
+    │   ├── summary_metrics.csv
+    │   ├── classification_report.csv
+    │   ├── shap_feature_importance.csv
+    │   ├── test_predictions.csv
+    │   ├── business_insight_summary.csv
+    │   ├── gridsearch_cv_results.csv
+    │   ├── adaboost_baseline_vs_tuned_summary.csv
+    │   └── [other_metrics.csv]
+    └── images/                        # Visualizations
+        ├── cv_baseline_grouped_bar.png
+        ├── cv_baseline_fold_lines_all_metrics.png
+        ├── adaboost_baseline_vs_tuned_bar.png
+        ├── adaboost_tuning_delta.png
+        ├── confusion_matrix.png
+        ├── roc_curve.png
+        ├── precision_recall_threshold.png
+        ├── calibration_curve.png
+        ├── profit_curve.png
+        ├── shap_bar_plot.png
+        ├── shap_summary_plot.png
+        ├── shap_dependence_*.png
+        ├── shap_waterfall_*.png
+        └── [other_visualizations.png]
 
 ```
 
