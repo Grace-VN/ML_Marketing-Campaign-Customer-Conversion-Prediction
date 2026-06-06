@@ -10,14 +10,16 @@ from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import StackingClassifier
 from xgboost import XGBClassifier
-from lightgbm import LGBMClassifier
-from catboost import CatBoostClassifier
+from sklearn.ensemble import RandomForestClassifier, StackingClassifier, AdaBoostClassifier, ExtraTreesClassifier
+from sklearn.svm import SVC
+from sklearn.neural_network import MLPClassifier
+from sklearn.linear_model import LogisticRegression
 
 ROOT_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 os.makedirs(ROOT_DIR / 'output_storage' / 'catboost_info', exist_ok=True)
-from input_processing.train_test_split import X_test, y_test, X_test, y_test
-from input_processing.normalization_encoding import preprocessor
+from input_processing.train_test_split import X_temp, y_temp, X_test, y_test
+from input_processing.normalization_encoding import preprocessor   # ← just the object
 
 # ==============================
 # Output Paths
@@ -31,8 +33,8 @@ os.makedirs(IMAGE_DIR, exist_ok=True)
 # Class Imbalance Weight
 # ==============================
 # Compute from training labels so scale_pos_weight is data-driven
-neg   = (y_test == 0).sum()
-pos   = (y_test == 1).sum()
+neg   = (y_temp == 0).sum()
+pos   = (y_temp == 1).sum()
 spw   = round(neg / pos, 2)
 print(f"Class balance  →  negative: {neg}  |  positive: {pos}  |  scale_pos_weight: {spw}\n")
 
@@ -40,47 +42,51 @@ print(f"Class balance  →  negative: {neg}  |  positive: {pos}  |  scale_pos_we
 # Baseline Models
 # ==============================
 baseline_models = {
-    'LogisticRegression': LogisticRegression(
+    # ── Bagging / randomized trees ────────────────────────────────────────────
+    'RandomForest': RandomForestClassifier(
         random_state=42,
-        max_iter=1000,
-        class_weight='balanced'
-        # n_jobs removed
-    ),
-    'XGBoost': XGBClassifier(
-        random_state=42,
-        eval_metric='logloss',
-        scale_pos_weight=spw,
-        n_jobs=-1
-    ),
-    'LightGBM': LGBMClassifier(
-        random_state=42,
-        is_unbalance=True,
+        class_weight='balanced',
         n_jobs=-1,
-        verbose=-1
     ),
-    'CatBoost': CatBoostClassifier(
+
+    # ── Margin / kernel ───────────────────────────────────────────────────────
+    'SVM': SVC(
         random_state=42,
-        auto_class_weights='Balanced',
-        verbose=0,
-        train_dir=str(ROOT_DIR / 'output_storage' / 'catboost_info')   # ← add this
+        class_weight='balanced',
+        probability=True,           # required for predict_proba in stacking
+        kernel='rbf',
     ),
+
+    # ── Neural net ────────────────────────────────────────────────────────────
+    'MLP': MLPClassifier(
+        random_state=42,
+        hidden_layer_sizes=(128, 64),
+        max_iter=500,
+        early_stopping=True,
+        validation_fraction=0.1,
+    ),
+
+    # ── Gradient boosting trio ────────────────────────────────────────────────
+    'AdaBoost': AdaBoostClassifier(
+        random_state=42,
+        n_estimators=200,
+        learning_rate=0.5,      
+    ),
+
+    # ── Stacking ensemble ─────────────────────────────────────────────────────
     'Stacking': StackingClassifier(
         estimators=[
-            ('xgb',  XGBClassifier(random_state=42, eval_metric='logloss',
-                                   scale_pos_weight=spw, n_jobs=-1)),
-            ('lgbm', LGBMClassifier(random_state=42, is_unbalance=True,
-                                    n_jobs=-1, verbose=-1)),
-            ('cat', CatBoostClassifier(
-    random_state=42,
-    auto_class_weights='Balanced',
-    verbose=0,
-    train_dir=str(ROOT_DIR / 'output_storage' / 'catboost_info')
-)),
+            ('rf',   RandomForestClassifier(random_state=42,
+                                            class_weight='balanced',
+                                            n_jobs=-1)),
+            ('svm',  SVC(random_state=42, class_weight='balanced',
+                         probability=True, kernel='rbf')),
+            ('ada',  AdaBoostClassifier(random_state=42, n_estimators=200, learning_rate=0.5,)),
         ],
         final_estimator=LogisticRegression(class_weight='balanced'),
         cv=5,
-        n_jobs=-1
-    )
+        n_jobs=-1,
+    ),
 }
 
 # ==============================
@@ -112,7 +118,7 @@ for name, model in baseline_models.items():
     metric_scores = {}
     for metric_key, sklearn_scorer in METRICS.items():
         scores = cross_val_score(
-            pipeline, X_test, y_test,
+            pipeline, X_temp, y_temp,
             cv=skf, scoring=sklearn_scorer, n_jobs=-1
         )
         metric_scores[metric_key] = scores
@@ -157,12 +163,13 @@ print(f"[Saved] Per-fold scores   → {fold_path}")
 # Helpers
 # ==============================
 MODEL_COLORS = {
-    'LogisticRegression': 'steelblue',
-    'XGBoost':            'darkorange',
-    'LightGBM':           'seagreen',
-    'CatBoost':           'mediumpurple',
-    'Stacking':           'crimson',
+    'RandomForest':       'forestgreen',
+    'SVM':                'darkorange',
+    'MLP':                'mediumpurple',
+    'AdaBoost':            'crimson',
+    'Stacking':           'goldenrod'
 }
+
 names     = summary_df["model"].tolist()
 colors    = [MODEL_COLORS[n] for n in names]
 fold_nums = list(range(1, skf.n_splits + 1))
@@ -210,7 +217,7 @@ ax.set_xlabel('Metric')
 ax.set_ylabel('Score')
 ax.set_xticks(x)
 ax.set_xticklabels(metric_lbls)
-ax.legend(loc='upper right')
+ax.legend(loc='upper left')
 ax.grid(axis='y', alpha=0.3)
 plt.tight_layout()
 

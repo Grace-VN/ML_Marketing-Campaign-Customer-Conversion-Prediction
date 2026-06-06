@@ -11,7 +11,9 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 ROOT_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
-from input_processing.train_test_split import X_train   # ← fixed module path
+# Import feature engineering to ensure CostPerVisit exists
+from input_processing.feature_engineering import df  # ← Ensures engineered features are created
+from input_processing.train_test_split import X_temp   # ← fixed module path
 
 # ==============================
 # Output Paths
@@ -28,7 +30,7 @@ num_cols = [
     'Age', 'Income', 'AdSpend', 'ClickThroughRate', 'ConversionRate',
     'WebsiteVisits', 'PagesPerVisit', 'TimeOnSite', 'SocialShares',
     'EmailOpens', 'EmailClicks', 'PreviousPurchases', 'LoyaltyPoints',
-    # Engineered features
+    # Engineered features (excluding AgeBand)
     'CostPerVisit', 'CostPerClick', 'EmailEngagementRate',
     'CustomerValue', 'IncomeToAdSpend', 'SiteEngagementScore',
     'SocialAmplification', 'CTR_x_PagesPerVisit'
@@ -57,7 +59,7 @@ preprocessor = ColumnTransformer(
 # ==============================
 # Fit & Transform
 # ==============================
-X_transformed = preprocessor.fit_transform(X_train)
+X_transformed = preprocessor.fit_transform(X_temp)
 
 # ==============================
 # Feature Name Resolution
@@ -67,7 +69,7 @@ encoded_features = (
                  .named_steps['onehot']
                  .get_feature_names_out(cat_cols)
 )
-passthrough_cols = [col for col in X_train.columns if col not in num_cols + cat_cols]
+passthrough_cols = [col for col in X_temp.columns if col not in num_cols + cat_cols]
 all_features     = num_cols + list(encoded_features) + passthrough_cols
 
 # ==============================
@@ -76,7 +78,7 @@ all_features     = num_cols + list(encoded_features) + passthrough_cols
 print("=" * 50)
 print("Preprocessing Completed")
 print("=" * 50)
-print(f"\nOriginal Feature Shape    : {X_train.shape}")
+print(f"\nOriginal Feature Shape    : {X_temp.shape}")
 print(f"Transformed Feature Shape : {X_transformed.shape}")
 print(f"\nTotal Engineered Features : {len(all_features)}")
 print("\nSample Features:")
@@ -107,7 +109,7 @@ print(f"[Saved] Feature inventory       → {feature_inventory_path}")
 
 # --- Preprocessing Summary → CSV ---
 summary_df = pd.DataFrame([{
-    "original_shape":    str(X_train.shape),
+    "original_shape":    str(X_temp.shape),
     "transformed_shape": str(X_transformed.shape),
     "n_numerical":       len(num_cols),
     "n_categorical_raw": len(cat_cols),
@@ -147,9 +149,9 @@ plt.close()
 # ==============================
 plot_cols = [
     'Age', 'Income', 'AdSpend', 'ClickThroughRate',
-    'WebsiteVisits', 'TimeOnSite', 'EmailEngagementRate',
-    'CustomerValue', 'SiteEngagementScore', 'CTR_x_PagesPerVisit',
-    'SocialAmplification', 'CostPerClick'
+    'WebsiteVisits', 'TimeOnSite', 'ConversionRate',
+    'PreviousPurchases', 'LoyaltyPoints', 'SocialShares',
+    'EmailOpens', 'EmailClicks'
 ]
 num_df = transformed_df[plot_cols]
 

@@ -1,0 +1,4 @@
+model,mean_auc_roc,std_auc_roc,mean_accuracy,std_accuracy,mean_f1,std_f1,mean_precision,std_precision,mean_recall,std_recall
+AdaBoost_Baseline,0.829424,0.042594,0.896719,0.001344,0.9443,0.000691,0.89548,0.001411,0.998752,0.00107
+AdaBoost_Tuned,0.801282,0.039707,0.911875,0.006782,0.951619,0.003631,0.917332,0.005609,0.988592,0.003447
+Delta (Tuned - Baseline),-0.028142,,0.015156,,0.007319,,0.021852,,-0.01016,

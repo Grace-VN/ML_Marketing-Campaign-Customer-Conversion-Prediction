@@ -54,3 +54,4 @@ new_cols = [
     'SocialAmplification', 'CTR_x_PagesPerVisit', 'AgeBand'
 ]
 print(df[new_cols].head(3))
+print(df.head(3))
